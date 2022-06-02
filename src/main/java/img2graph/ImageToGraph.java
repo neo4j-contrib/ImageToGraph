@@ -4,14 +4,19 @@ import img2graph.FlowFill.Segment;
 import img2graph.ImageReader.Image;
 import img2graph.NodeGenerator.Node;
 import img2graph.RelationshipGenerator.Relationship;
+
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
-import javax.imageio.ImageIO;
+
 import picocli.CommandLine;
+
+import javax.imageio.ImageIO;
 
 @CommandLine.Command(name = "Img2Graph", description = "Convert an image to a graph")
 public class ImageToGraph implements Callable<Object> {
@@ -70,6 +75,7 @@ public class ImageToGraph implements Callable<Object> {
         System.exit(new CommandLine(new ImageToGraph()).execute(args));
     }
 
+    public record Result(Image img, List<Node> allNodes, List<Relationship> allRels) {};
     @Override
     public Object call() throws Exception {
         if (!Files.exists(input)) {
@@ -81,14 +87,36 @@ public class ImageToGraph implements Callable<Object> {
         }
         output = output.toAbsolutePath();
 
-        System.out.println("Reading, scaling, simplifying image");
-        Image img = new ImageReader(targetResolution, colorDepth).readImage(input);
+        Result result = process(new FileInputStream(input.toFile()));
+
         String fileName = input.getFileName().toString();
         if (fileName.lastIndexOf('.') != -1) {
             fileName = fileName.substring(0, fileName.lastIndexOf('.'));
         }
-        ImageIO.write(
-                img.source, "png", output.resolve(fileName + "_simplified.png").toFile());
+        ImageIO.write(result.img().source, "png", output.resolve(fileName + "_simplified.png").toFile());
+
+        System.out.printf("Graph complete. Total %d nodes & %d relationships%n", result.allNodes().size(), result.allRels().size());
+        System.out.println("Files saved at: " + output);
+        System.out.println("Copy the json content and paste/import at https://arrows.app/ or use the url");
+        System.out.println("Or use the generated svg directly");
+        Path nodeOutput = output.resolve(fileName + "-nodes.csv").toAbsolutePath();
+        Path relOutput = output.resolve(fileName + "-rels.csv").toAbsolutePath();
+        Path urlOutput = output.resolve(fileName + "-url.txt").toAbsolutePath();
+        Path jsonOutput = output.resolve(fileName + "-graph.json").toAbsolutePath();
+        Path svgOutput = output.resolve(fileName + "-graph.svg").toAbsolutePath();
+        Files.writeString(nodeOutput, Output.nodesToCsv(result.allNodes()));
+        Files.writeString(relOutput, Output.relationshipsToCsv(result.allRels()));
+        String json = Output.graphToJson(result.allNodes(), result.allRels());
+        Files.writeString(jsonOutput, json);
+        Files.writeString(urlOutput, Output.arrowsUrl(json));
+        Files.writeString(svgOutput, Output.graphToSvg(result.img(), transparentBg, result.allNodes(), result.allRels()));
+        return null;
+
+    }
+
+    public Result process(InputStream stream) {
+        System.out.println("Reading, scaling, simplifying image");
+        Image img = new ImageReader(targetResolution, colorDepth).readImage(stream);
 
         System.out.println("Find segments");
         FlowFill flowFill = new FlowFill(img);
@@ -116,21 +144,6 @@ public class ImageToGraph implements Callable<Object> {
             allNodes.addAll(nodes);
             allRels.addAll(relationships);
         }
-        System.out.printf("Graph complete. Total %d nodes & %d relationships%n", allNodes.size(), allRels.size());
-        System.out.println("Files saved at: " + output);
-        System.out.println("Copy the json content and paste/import at https://arrows.app/ or use the url");
-        System.out.println("Or use the generated svg directly");
-        Path nodeOutput = output.resolve(fileName + "-nodes.csv").toAbsolutePath();
-        Path relOutput = output.resolve(fileName + "-rels.csv").toAbsolutePath();
-        Path urlOutput = output.resolve(fileName + "-url.txt").toAbsolutePath();
-        Path jsonOutput = output.resolve(fileName + "-graph.json").toAbsolutePath();
-        Path svgOutput = output.resolve(fileName + "-graph.svg").toAbsolutePath();
-        Files.writeString(nodeOutput, Output.nodesToCsv(allNodes));
-        Files.writeString(relOutput, Output.relationshipsToCsv(allRels));
-        String json = Output.graphToJson(allNodes, allRels);
-        Files.writeString(jsonOutput, json);
-        Files.writeString(urlOutput, Output.arrowsUrl(json));
-        Files.writeString(svgOutput, Output.graphToSvg(img, transparentBg, allNodes, allRels));
-        return null;
+        return new Result(img, allNodes, allRels);
     }
 }

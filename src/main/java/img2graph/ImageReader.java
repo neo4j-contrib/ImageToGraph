@@ -2,9 +2,7 @@ package img2graph;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.io.UncheckedIOException;
+import java.io.*;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -26,10 +24,9 @@ class ImageReader {
         this.colorDepth = colorDepth;
     }
 
-    Image readImage(Path path) {
-        File input = path.toFile();
+    Image readImage(InputStream stream) {
         try {
-            BufferedImage image = alphaToWhite(resizeImage(ImageIO.read(input), targetRes));
+            BufferedImage image = alphaToWhite(resizeImage(ImageIO.read(stream), targetRes));
             return simplifyColor(image);
         } catch (IOException e) {
             throw new UncheckedIOException(e);

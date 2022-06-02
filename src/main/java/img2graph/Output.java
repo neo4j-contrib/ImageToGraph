@@ -9,9 +9,9 @@ import java.util.Base64;
 import java.util.Collection;
 import org.jfree.svg.SVGGraphics2D;
 
-class Output {
+public class Output {
 
-    static String graphToSvg(
+    public static String graphToSvg(
             Image img, boolean transparentBg, Collection<Node> nodes, Collection<Relationship> relationships) {
         SVGGraphics2D svg = new SVGGraphics2D(img.width, img.height);
         if (!transparentBg) {
