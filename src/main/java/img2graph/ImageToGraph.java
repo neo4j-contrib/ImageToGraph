@@ -18,7 +18,7 @@ import picocli.CommandLine;
 
 import javax.imageio.ImageIO;
 
-@CommandLine.Command(name = "Img2Graph", description = "Convert an image to a graph")
+@CommandLine.Command(name = "convert", description = "Convert an image to a graph")
 public class ImageToGraph implements Callable<Object> {
 
     @CommandLine.Parameters(index = "0", description = "Path to image to operate on")
@@ -71,11 +71,8 @@ public class ImageToGraph implements Callable<Object> {
             description = "Transparent background for SVG output. (default: " + "${DEFAULT-VALUE})")
     private boolean transparentBg;
 
-    public static void main(String[] args) {
-        System.exit(new CommandLine(new ImageToGraph()).execute(args));
-    }
-
     public record Result(Image img, List<Node> allNodes, List<Relationship> allRels) {};
+
     @Override
     public Object call() throws Exception {
         if (!Files.exists(input)) {

@@ -10,7 +10,7 @@ Run: java17
 
 1. Open a terminal and `cd` into this folder.
 2. Run `maven install` OR `mvn install` on Windows.
-3. Run `./run.sh /path/to/img` OR `java -jar .\target\img2graph-1.jar \path\to\image` on Windows.
+3. Run `./run.sh /path/to/img` OR `java -jar .\target\img2graph-1.jar convert \path\to\image` on Windows.
 
 ## Arguments
 

@@ -1,1 +1,1 @@
-java -jar $( dirname -- "$( readlink -f -- "$0"; )"; )/target/img2graph-1.jar $@
+java -jar $( dirname -- "$( readlink -f -- "$0"; )"; )/target/img2graph-1.jar convert $@
