@@ -24,8 +24,8 @@ public class MultiFileUploadController {
     }
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces(MediaType.APPLICATION_SVG_XML)
+    @Produces("image/svg+xml")
     public Response fileUpload(@MultipartForm MultipartFormDataInput input) {
-        return Response.ok().entity(fileUploadService.uploadFile(input)).build();
+        return Response.ok().header("Content-Disposition","inline").entity(fileUploadService.uploadFile(input)).build();
     }
 }
