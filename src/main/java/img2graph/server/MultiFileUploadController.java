@@ -16,11 +16,38 @@ public class MultiFileUploadController {
     @GET()
     public String index() {
         return """
-                <form method='post' enctype='multipart/form-data'>
-                <input type='file' name='file' accept='image/*'>
-                <button>Upload Image</button>
-                </form>
-               """;
+                 <style type='text/css'>
+                 .upload-btn-wrapper {
+                   position: relative;
+                   overflow: hidden;
+                   display: inline-block;
+                 }
+                 
+                 .btn {
+                   border: 2px solid gray;
+                   color: gray;
+                   background-color: white;
+                   padding: 8px 20px;
+                   border-radius: 8px;
+                   font-size: 20px;
+                   font-weight: bold;
+                 }
+                 
+                 .upload-btn-wrapper input[type=file] {
+                   font-size: 100px;
+                   position: absolute;
+                   left: 0;
+                   top: 0;
+                   opacity: 0;
+                 }
+                 </style>
+                 <div class="upload-btn-wrapper">
+                     <form method='post' enctype='multipart/form-data'>
+                        <button class='btn'>Upload a file</button>
+                        <input type='file' name='file' accept='image/*' multiple='false' onchange="submit()" />
+                     </form>
+                  </div>
+                """;
     }
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
