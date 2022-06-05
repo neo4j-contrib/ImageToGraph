@@ -22,7 +22,42 @@ public class FileUploadService {
 
     String UPLOAD_DIR = "/tmp/upload";
 
+    public String preview(MultipartFormDataInput input) {
+        ImageToGraph imageToGraph = fromForm(input);
+        imageToGraph.targetResolution = 200;
+        ImageToGraph.Result result;
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("preview.png")) {
+            result = imageToGraph.process(inputStream);
+            return Output.graphToSvg(result.img(), true, result.allNodes(), result.allRels());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "Preview not available";
+    }
+
     public String uploadFile(MultipartFormDataInput input) {
+        ImageToGraph imageToGraph = fromForm(input);
+        Map<String, List<InputPart>> uploadForm = input.getFormDataMap();
+        List<InputPart> inputParts = uploadForm.get("file");
+        return inputParts.stream()
+                .flatMap(inputPart -> getFileName(inputPart.getHeaders()).map(fileName -> {
+                    System.out.println("fileName = " + fileName);
+                    try {
+                        ImageToGraph.Result result;
+                        try (InputStream inputStream = inputPart.getBody(InputStream.class, null)) {
+                            result = imageToGraph.process(inputStream);
+                        }
+                        return Output.graphToSvg(result.img(), true, result.allNodes(), result.allRels());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        return null;
+                    }
+                }))
+                .findFirst()
+                .orElse("No File Processed");
+    }
+
+    private ImageToGraph fromForm(MultipartFormDataInput input) {
         ImageToGraph imageToGraph = new ImageToGraph();
         Map<String, List<InputPart>> uploadForm = input.getFormDataMap();
         try {
@@ -45,21 +80,7 @@ public class FileUploadService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        List<InputPart> inputParts = uploadForm.get("file");
-        return inputParts.stream()
-                .flatMap(inputPart -> getFileName(inputPart.getHeaders()).map(fileName -> {
-                    System.out.println("fileName = " + fileName);
-                    try {
-                        InputStream inputStream = inputPart.getBody(InputStream.class, null);
-                        var result = imageToGraph.process(inputStream);
-                        return Output.graphToSvg(result.img(), true, result.allNodes(), result.allRels());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        return null;
-                    }
-                }))
-                .findFirst()
-                .orElse("No File Processed");
+        return imageToGraph;
     }
 
     private void writeFile(InputStream inputStream,String fileName) throws IOException {

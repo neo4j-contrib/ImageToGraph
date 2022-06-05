@@ -38,6 +38,12 @@
         background-color: aliceblue;
     }
 
+    #preview {
+        margin-top: -15px;
+        padding: 10px;
+        background-color: aliceblue;
+    }
+
     .advancedLabel {
         padding-left: 10px;
         font-size: 15px;
@@ -66,7 +72,7 @@
     }
 </style>
 <div class="upload-btn-wrapper">
-    <form method='post' enctype='multipart/form-data'>
+    <form id="submit-img" method='post' enctype='multipart/form-data'>
         <button class='btn'>Upload a file</button>
         <input type='file' name='file' accept='image/*' multiple='false' onchange="submit()"/>
         <div id="advanced" style="display:none">
@@ -102,8 +108,14 @@
                    oninput="this.nextElementSibling.value = this.value">
             <output class="sliderOutput"></output>
             <label class="advancedLabel" for="color-depth">Color depth (bits)</label>
+            <br>
         </div>
     </form>
+    <div id="preview" style="display:none">
+        <button class="btn" name="preview" style="font-size: 10px; padding: 5px;" onclick="preview()">Preview</button>
+        <br>
+        <div id="preview-container" style="width: 200px; height: 200px"></div>
+    </div>
 </div>
 <div>
     <div>
@@ -116,8 +128,25 @@
         }
 
         function toggleAdvanced() {
-            const x = document.getElementById("advanced");
-            x.style.display = x.style.display === "none" ? "block" : "none";
+            const adv = document.getElementById("advanced");
+            const disp = adv.style.display === "none" ? "block" : "none";
+            adv.style.display = disp;
+            document.getElementById("preview").style.display = disp
+        }
+
+        function preview() {
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "/preview");
+            xhr.overrideMimeType("image/svg+xml");
+            xhr.onload = function () {
+                let container = document.getElementById("preview-container");
+                while (container.firstChild) {
+                    container.removeChild(container.firstChild);
+                }
+                let svg = xhr.responseXML.documentElement;
+                container.appendChild(svg);
+            };
+            xhr.send(new FormData(document.getElementById("submit-img")));
         }
     </script>
 </div>

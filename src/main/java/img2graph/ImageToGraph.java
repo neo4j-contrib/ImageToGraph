@@ -51,7 +51,7 @@ public class ImageToGraph implements Callable<Object> {
     @CommandLine.Option(
             names = "--target-res",
             description = "Target resolution. Changes size of graph. (default: ${DEFAULT-VALUE})")
-    private int targetResolution = 1024;
+    public int targetResolution = 1024;
 
     @CommandLine.Option(
             names = "--color-depth",

@@ -2,8 +2,9 @@ package img2graph;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
-import java.io.*;
-import java.nio.file.Path;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -69,7 +70,7 @@ class ImageReader {
                 image.setRGB(x, y, simplified.raw);
             }
         }
-        addDebugPalette(image, palette);
+        // addDebugPalette(image, palette);
         return img;
     }
 
