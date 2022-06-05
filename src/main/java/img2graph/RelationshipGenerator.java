@@ -36,10 +36,11 @@ class RelationshipGenerator {
                 .thenComparingInt(n -> n.coordinate().x()));
         sortedX.addAll(nodes);
         sortedY.addAll(nodes);
+        int biggestNode = nodes.stream().map(Node::radius).max(Integer::compare).orElse(0);
         for (Node node : nodes) {
-            List<Node> neighbors = nearestNeighbors(node, 10);
+            List<Node> neighbors = nearestNeighbors(node, 10, biggestNode);
             neighbors.sort(Comparator.comparingDouble(n -> weightedSort(n, node)));
-            for (int i = 0; i < 2 && i < neighbors.size(); i++) {
+            for (int i = 0; i < numRels && i < neighbors.size(); i++) {
                 Relationship relationship = new Relationship(node, neighbors.get(i), relId++);
                 if (validate(relationship)) {
                     relationships.add(relationship);
@@ -54,6 +55,12 @@ class RelationshipGenerator {
         Coordinate to = relationship.to().coordinate();
         int diffX = to.x() - from.x();
         int diffY = to.y() - from.y();
+        double dist = Math.sqrt(from.distSq(to))
+                - relationship.from().radius()
+                - relationship.to().radius();
+        if (dist > maxDistance) {
+            return false;
+        }
         int steps = Math.max(Math.abs(diffX), Math.abs(diffY));
         double dx = diffX / (double) steps;
         double dy = diffY / (double) steps;
@@ -65,16 +72,17 @@ class RelationshipGenerator {
         return true;
     }
 
-    private List<Node> nearestNeighbors(Node node, int limit) {
+    private List<Node> nearestNeighbors(Node node, int limit, int biggestNode) {
+        int maxDist = maxDistance + biggestNode + node.radius();
         Node lowKey = new Node(
                 new Coordinate(
-                        node.coordinate().x() - maxDistance, node.coordinate().y() - maxDistance),
+                        node.coordinate().x() - maxDist, node.coordinate().y() - maxDist),
                 0,
                 0,
                 null);
         Node highKey = new Node(
                 new Coordinate(
-                        node.coordinate().x() + maxDistance, node.coordinate().y() + maxDistance),
+                        node.coordinate().x() + maxDist, node.coordinate().y() + maxDist),
                 0,
                 0,
                 null);

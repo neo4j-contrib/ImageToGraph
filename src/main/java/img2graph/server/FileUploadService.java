@@ -2,11 +2,6 @@ package img2graph.server;
 
 import img2graph.ImageToGraph;
 import img2graph.Output;
-import org.apache.commons.io.IOUtils;
-import org.jboss.resteasy.plugins.providers.multipart.InputPart;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
-import javax.inject.Singleton;
-import javax.ws.rs.core.MultivaluedMap;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,6 +11,11 @@ import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
+import javax.inject.Singleton;
+import javax.ws.rs.core.MultivaluedMap;
+import org.apache.commons.io.IOUtils;
+import org.jboss.resteasy.plugins.providers.multipart.InputPart;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
 @Singleton
 public class FileUploadService {
@@ -23,20 +23,43 @@ public class FileUploadService {
     String UPLOAD_DIR = "/tmp/upload";
 
     public String uploadFile(MultipartFormDataInput input) {
+        ImageToGraph imageToGraph = new ImageToGraph();
         Map<String, List<InputPart>> uploadForm = input.getFormDataMap();
+        try {
+            boolean useSimpleColors = uploadForm.containsKey("simple-color");
+            int nodeMax = uploadForm.get("node-max").get(0).getBody(Integer.class, null);
+            int nodeMin = uploadForm.get("node-min").get(0).getBody(Integer.class, null);
+            int nodePadding = uploadForm.get("node-padding").get(0).getBody(Integer.class, null);
+            int colorDepth = uploadForm.get("color-depth").get(0).getBody(Integer.class, null);
+            int relAvg = uploadForm.get("rel-avg").get(0).getBody(Integer.class, null);
+            int relLength = uploadForm.get("rel-max-length").get(0).getBody(Integer.class, null);
+
+            imageToGraph.simplifiedColors = useSimpleColors;
+            imageToGraph.nodeMaxRad = Math.max(nodeMax, nodeMin);
+            imageToGraph.nodeMinRad = Math.min(nodeMax, nodeMin);
+            imageToGraph.nodePadding = nodePadding;
+            imageToGraph.colorDepth = colorDepth;
+            imageToGraph.relsPerNode = relAvg;
+            imageToGraph.relMaxDist = relLength;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         List<InputPart> inputParts = uploadForm.get("file");
-        return inputParts.stream().flatMap(inputPart ->
-                getFileName(inputPart.getHeaders()).map(fileName -> {
+        return inputParts.stream()
+                .flatMap(inputPart -> getFileName(inputPart.getHeaders()).map(fileName -> {
                     System.out.println("fileName = " + fileName);
                     try {
                         InputStream inputStream = inputPart.getBody(InputStream.class, null);
-                        var result = new ImageToGraph().process(inputStream);
+                        var result = imageToGraph.process(inputStream);
                         return Output.graphToSvg(result.img(), true, result.allNodes(), result.allRels());
                     } catch (IOException e) {
                         e.printStackTrace();
                         return null;
                     }
-                })).findFirst().orElse("No File Processed");
+                }))
+                .findFirst()
+                .orElse("No File Processed");
     }
 
     private void writeFile(InputStream inputStream,String fileName) throws IOException {

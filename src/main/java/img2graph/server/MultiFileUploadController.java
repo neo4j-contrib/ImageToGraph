@@ -1,11 +1,17 @@
 package img2graph.server;
 
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
+import java.io.IOException;
+import java.io.InputStream;
 import javax.inject.Inject;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
 @Path("/")
 public class MultiFileUploadController {
@@ -14,40 +20,10 @@ public class MultiFileUploadController {
     FileUploadService fileUploadService;
 
     @GET()
-    public String index() {
-        return """
-                 <style type='text/css'>
-                 .upload-btn-wrapper {
-                   position: relative;
-                   overflow: hidden;
-                   display: inline-block;
-                 }
-                 
-                 .btn {
-                   border: 2px solid gray;
-                   color: gray;
-                   background-color: white;
-                   padding: 8px 20px;
-                   border-radius: 8px;
-                   font-size: 20px;
-                   font-weight: bold;
-                 }
-                 
-                 .upload-btn-wrapper input[type=file] {
-                   font-size: 100px;
-                   position: absolute;
-                   left: 0;
-                   top: 0;
-                   opacity: 0;
-                 }
-                 </style>
-                 <div class="upload-btn-wrapper">
-                     <form method='post' enctype='multipart/form-data'>
-                        <button class='btn'>Upload a file</button>
-                        <input type='file' name='file' accept='image/*' multiple='false' onchange="submit()" />
-                     </form>
-                  </div>
-                """;
+    public String index() throws IOException {
+        try (InputStream is = getClass().getClassLoader().getResourceAsStream("index.html")) {
+            return new String(is.readAllBytes());
+        }
     }
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)

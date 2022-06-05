@@ -1,0 +1,123 @@
+<style type='text/css'>
+    .upload-btn-wrapper {
+        position: relative;
+        overflow: hidden;
+        display: inline-block;
+    }
+
+    .btn {
+        border: 2px solid gray;
+        color: gray;
+        background-color: white;
+        padding: 8px 20px;
+        border-radius: 8px;
+        font-size: 20px;
+        font-weight: bold;
+    }
+
+    .upload-btn-wrapper input[type=file] {
+        font-size: 100px;
+        position: absolute;
+        left: 0;
+        top: 0;
+        opacity: 0;
+    }
+
+    .checkbox {
+        position: relative;
+        top: 0;
+        left: 0;
+        height: 25px;
+        width: 25px;
+        background-color: #eee;
+        vertical-align: middle;
+    }
+
+    #advanced {
+        padding: 10px;
+        background-color: aliceblue;
+    }
+
+    .advancedLabel {
+        padding-left: 10px;
+        font-size: 15px;
+        color: #444;
+        font-family: Consolas, Baskerville, 'Segoe UI', sans-serif;
+    }
+
+    .sliderOutput {
+        padding-left: 10px;
+        font-size: 15px;
+        color: #444;
+        font-family: Consolas, Baskerville, 'Segoe UI', sans-serif;
+    }
+
+    .slider {
+        vertical-align: middle;
+        -webkit-appearance: none;
+        appearance: none;
+        width: 200px;
+        height: 25px;
+        background: #d3d3d3;
+        outline: none;
+        opacity: 0.7;
+        -webkit-transition: .2s;
+        transition: opacity .2s;
+    }
+</style>
+<div class="upload-btn-wrapper">
+    <form method='post' enctype='multipart/form-data'>
+        <button class='btn'>Upload a file</button>
+        <input type='file' name='file' accept='image/*' multiple='false' onchange="submit()"/>
+        <div id="advanced" style="display:none">
+            <input id="simple-color" class='checkbox' type="checkbox" name="simple-color">
+            <label class="advancedLabel" for="simple-color">Use simple colors</label>
+            <br>
+            <input id="node-max" type="range" min="1" max="50" value="10" class="slider" name="node-max"
+                   oninput="this.nextElementSibling.value = this.value">
+            <output class="sliderOutput"></output>
+            <label class="advancedLabel" for="node-max">Node max size</label>
+            <br>
+            <input id="node-min" type="range" min="1" max="30" value="3" class="slider" name="node-min"
+                   oninput="this.nextElementSibling.value = this.value">
+            <output class="sliderOutput"></output>
+            <label class="advancedLabel" for="node-min">Node min size</label>
+            <br>
+            <input id="node-padding" type="range" min="1" max="10" value="2" class="slider" name="node-padding"
+                   oninput="this.nextElementSibling.value = this.value">
+            <output class="sliderOutput"></output>
+            <label class="advancedLabel" for="node-padding">Node padding</label>
+            <br>
+            <input id="rel-avg" type="range" min="1" max="5" value="2" class="slider" name="rel-avg"
+                   oninput="this.nextElementSibling.value = this.value">
+            <output id="rel-avg-out" class="sliderOutput"></output>
+            <label class="advancedLabel" for="rel-avg">Avg relationships</label>
+            <br>
+            <input id="rel-max-length" type="range" min="1" max="100" value="20" class="slider" name="rel-max-length"
+                   oninput="this.nextElementSibling.value = this.value">
+            <output id="rel-max-length-out" class="sliderOutput"></output>
+            <label class="advancedLabel" for="rel-max-length">Max relationship length</label>
+            <br>
+            <input id="color-depth" type="range" min="1" max="6" value="4" class="slider" name="color-depth"
+                   oninput="this.nextElementSibling.value = this.value">
+            <output class="sliderOutput"></output>
+            <label class="advancedLabel" for="color-depth">Color depth (bits)</label>
+        </div>
+    </form>
+</div>
+<div>
+    <div>
+        <button class="btn" style="font-size: 10px; padding: 5px" onclick="toggleAdvanced()">Advanced options</button>
+    </div>
+
+    <script>
+        for (const out of document.getElementsByClassName("sliderOutput")) {
+            out.value = out.previousElementSibling.value
+        }
+
+        function toggleAdvanced() {
+            const x = document.getElementById("advanced");
+            x.style.display = x.style.display === "none" ? "block" : "none";
+        }
+    </script>
+</div>

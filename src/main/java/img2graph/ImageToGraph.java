@@ -4,7 +4,6 @@ import img2graph.FlowFill.Segment;
 import img2graph.ImageReader.Image;
 import img2graph.NodeGenerator.Node;
 import img2graph.RelationshipGenerator.Relationship;
-
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -13,10 +12,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
-
-import picocli.CommandLine;
-
 import javax.imageio.ImageIO;
+import picocli.CommandLine;
 
 @CommandLine.Command(name = "convert", description = "Convert an image to a graph")
 public class ImageToGraph implements Callable<Object> {
@@ -33,23 +30,23 @@ public class ImageToGraph implements Callable<Object> {
     private boolean keepBackground;
 
     @CommandLine.Option(names = "--node-min-radius", description = "Node minimum radius. (default: ${DEFAULT-VALUE})")
-    private int nodeMinRad = 3;
+    public int nodeMinRad = 3;
 
     @CommandLine.Option(names = "--node-max-radius", description = "Node maximum radius. (default: ${DEFAULT-VALUE})")
-    private int nodeMaxRad = 10;
+    public int nodeMaxRad = 10;
 
     @CommandLine.Option(names = "--node-padding", description = "Node padding. (default: ${DEFAULT-VALUE})")
-    private int nodePadding = 2;
+    public int nodePadding = 2;
 
     @CommandLine.Option(
             names = "--rel-max-distance",
             description = "Relationship maximum distance. (default: ${DEFAULT-VALUE})")
-    private int relMaxDist = 30;
+    public int relMaxDist = 20;
 
     @CommandLine.Option(
             names = "--rels-per-node",
             description = "Avg relationships per node. (default: ${DEFAULT-VALUE})")
-    private int relsPerNode = 2;
+    public int relsPerNode = 2;
 
     @CommandLine.Option(
             names = "--target-res",
@@ -59,12 +56,12 @@ public class ImageToGraph implements Callable<Object> {
     @CommandLine.Option(
             names = "--color-depth",
             description = "Color depth for simplified image. (default: ${DEFAULT-VALUE})")
-    private int colorDepth = 4;
+    public int colorDepth = 4;
 
     @CommandLine.Option(
             names = "--simplified-colors",
             description = "Use simplified colors. (default: " + "${DEFAULT-VALUE})")
-    private boolean simplifiedColors;
+    public boolean simplifiedColors;
 
     @CommandLine.Option(
             names = "--transparent-bg",
