@@ -5,6 +5,7 @@ import img2graph.ImageReader.Color;
 import img2graph.ImageReader.Image;
 import img2graph.NodeGenerator.Node;
 import img2graph.RelationshipGenerator.Relationship;
+import java.awt.BasicStroke;
 import java.util.Base64;
 import java.util.Collection;
 import org.jfree.svg.SVGGraphics2D;
@@ -12,7 +13,11 @@ import org.jfree.svg.SVGGraphics2D;
 public class Output {
 
     public static String graphToSvg(
-            Image img, boolean transparentBg, Collection<Node> nodes, Collection<Relationship> relationships) {
+            Image img,
+            boolean transparentBg,
+            boolean outline,
+            Collection<Node> nodes,
+            Collection<Relationship> relationships) {
         SVGGraphics2D svg = new SVGGraphics2D(img.width, img.height);
         if (!transparentBg) {
             svg.setPaint(java.awt.Color.WHITE);
@@ -25,12 +30,20 @@ public class Output {
             Coordinate to = relationship.to().coordinate();
             svg.drawLine(from.x(), from.y(), to.x(), to.y());
         }
+        svg.setStroke(new BasicStroke(.50f));
         for (Node node : nodes) {
-            svg.setPaint(new java.awt.Color(node.color().raw()));
             int radius = node.radius();
             int side = radius * 2;
+            Color color = node.color();
+            svg.setPaint(new java.awt.Color(color.raw()));
             svg.fillOval(node.coordinate().x() - radius, node.coordinate().y() - radius, side, side);
+            if (outline) {
+                float factor = 0.5f / 255.f;
+                svg.setPaint(new java.awt.Color(color.r() * factor, color.g() * factor, color.b() * factor));
+                svg.drawOval(node.coordinate().x() - radius, node.coordinate().y() - radius, side, side);
+            }
         }
+
         return svg.getSVGElement();
     }
 

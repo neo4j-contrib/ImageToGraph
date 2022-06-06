@@ -68,7 +68,10 @@ public class ImageToGraph implements Callable<Object> {
             description = "Transparent background for SVG output. (default: " + "${DEFAULT-VALUE})")
     private boolean transparentBg;
 
-    public record Result(Image img, List<Node> allNodes, List<Relationship> allRels) {};
+    @CommandLine.Option(names = "--outline", description = "Outline on nodes (default: " + "${DEFAULT-VALUE})")
+    public boolean outline;
+
+    public record Result(Image img, List<Node> allNodes, List<Relationship> allRels) {}
 
     @Override
     public Object call() throws Exception {
@@ -87,9 +90,14 @@ public class ImageToGraph implements Callable<Object> {
         if (fileName.lastIndexOf('.') != -1) {
             fileName = fileName.substring(0, fileName.lastIndexOf('.'));
         }
-        ImageIO.write(result.img().source, "png", output.resolve(fileName + "_simplified.png").toFile());
+        ImageIO.write(
+                result.img().source,
+                "png",
+                output.resolve(fileName + "_simplified.png").toFile());
 
-        System.out.printf("Graph complete. Total %d nodes & %d relationships%n", result.allNodes().size(), result.allRels().size());
+        System.out.printf(
+                "Graph complete. Total %d nodes & %d relationships%n",
+                result.allNodes().size(), result.allRels().size());
         System.out.println("Files saved at: " + output);
         System.out.println("Copy the json content and paste/import at https://arrows.app/ or use the url");
         System.out.println("Or use the generated svg directly");
@@ -103,9 +111,10 @@ public class ImageToGraph implements Callable<Object> {
         String json = Output.graphToJson(result.allNodes(), result.allRels());
         Files.writeString(jsonOutput, json);
         Files.writeString(urlOutput, Output.arrowsUrl(json));
-        Files.writeString(svgOutput, Output.graphToSvg(result.img(), transparentBg, result.allNodes(), result.allRels()));
+        Files.writeString(
+                svgOutput,
+                Output.graphToSvg(result.img(), transparentBg, outline, result.allNodes(), result.allRels()));
         return null;
-
     }
 
     public Result process(InputStream stream) {

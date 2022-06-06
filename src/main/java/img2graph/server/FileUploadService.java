@@ -28,7 +28,7 @@ public class FileUploadService {
         ImageToGraph.Result result;
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("preview.png")) {
             result = imageToGraph.process(inputStream);
-            return Output.graphToSvg(result.img(), true, result.allNodes(), result.allRels());
+            return Output.graphToSvg(result.img(), true, imageToGraph.outline, result.allNodes(), result.allRels());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -47,7 +47,8 @@ public class FileUploadService {
                         try (InputStream inputStream = inputPart.getBody(InputStream.class, null)) {
                             result = imageToGraph.process(inputStream);
                         }
-                        return Output.graphToSvg(result.img(), true, result.allNodes(), result.allRels());
+                        return Output.graphToSvg(
+                                result.img(), true, imageToGraph.outline, result.allNodes(), result.allRels());
                     } catch (IOException e) {
                         e.printStackTrace();
                         return null;
@@ -62,6 +63,7 @@ public class FileUploadService {
         Map<String, List<InputPart>> uploadForm = input.getFormDataMap();
         try {
             boolean useSimpleColors = uploadForm.containsKey("simple-color");
+            boolean outline = uploadForm.containsKey("outline");
             int nodeMax = uploadForm.get("node-max").get(0).getBody(Integer.class, null);
             int nodeMin = uploadForm.get("node-min").get(0).getBody(Integer.class, null);
             int nodePadding = uploadForm.get("node-padding").get(0).getBody(Integer.class, null);
@@ -76,6 +78,7 @@ public class FileUploadService {
             imageToGraph.colorDepth = colorDepth;
             imageToGraph.relsPerNode = relAvg;
             imageToGraph.relMaxDist = relLength;
+            imageToGraph.outline = outline;
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -83,7 +86,7 @@ public class FileUploadService {
         return imageToGraph;
     }
 
-    private void writeFile(InputStream inputStream,String fileName) throws IOException {
+    private void writeFile(InputStream inputStream, String fileName) throws IOException {
         byte[] bytes = IOUtils.toByteArray(inputStream);
         File customDir = new File(UPLOAD_DIR);
         fileName = customDir.getAbsolutePath() + File.separator + fileName;
