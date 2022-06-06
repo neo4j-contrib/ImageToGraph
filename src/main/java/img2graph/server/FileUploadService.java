@@ -20,11 +20,12 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 @Singleton
 public class FileUploadService {
 
-    String UPLOAD_DIR = "/tmp/upload";
+    private static final String UPLOAD_DIR = "/tmp/upload";
 
     public String preview(MultipartFormDataInput input) {
         ImageToGraph imageToGraph = fromForm(input);
-        imageToGraph.targetResolution = 200;
+        imageToGraph.targetResolution = 350;
+        imageToGraph.keepBackground = true;
         ImageToGraph.Result result;
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("preview.png")) {
             result = imageToGraph.process(inputStream);

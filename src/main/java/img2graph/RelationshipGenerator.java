@@ -3,6 +3,7 @@ package img2graph;
 import static java.util.Comparator.comparingInt;
 
 import img2graph.FlowFill.Coordinate;
+import img2graph.ImageReader.Color;
 import img2graph.ImageReader.Image;
 import img2graph.NodeGenerator.Node;
 import java.util.Collection;
@@ -64,8 +65,9 @@ class RelationshipGenerator {
         int steps = Math.max(Math.abs(diffX), Math.abs(diffY));
         double dx = diffX / (double) steps;
         double dy = diffY / (double) steps;
+        Color simpleColor = image.colors[from.x()][from.y()];
         for (int i = 0; i < steps; i++) {
-            if (image.colors[(int) (from.x() + dx * i)][(int) (from.y() + dy * i)].equals(image.bg)) {
+            if (!image.colors[(int) (from.x() + dx * i)][(int) (from.y() + dy * i)].equals(simpleColor)) {
                 return false;
             }
         }

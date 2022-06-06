@@ -54,7 +54,7 @@ class ImageReader {
                 .collect(Collectors.toList());
 
         List<Color> palette;
-        if (trueColors.size() < 10 || trueColors.get(trueColors.size() - 1).size < 200) {
+        if (trueColors.size() < 10 || trueColors.get(trueColors.size() - 1).size < 100) {
             palette = trueColors.stream().map(cb -> new Color(cb.rgb)).collect(Collectors.toList());
         } else {
             palette = medianCut(image);
@@ -145,10 +145,10 @@ class ImageReader {
     private static void addDebugPalette(BufferedImage image, List<Color> palette) {
         for (int i = 0; i < palette.size(); i++) {
             Color c = palette.get(i);
-            int w = (i * 20) % 500;
-            int h = ((i * 20) / 500) * 20;
-            for (int x = 0; x < 20; x++) {
-                for (int y = 0; y < 20; y++) {
+            int w = (i * 10) % image.getWidth();
+            int h = ((i * 10) / image.getWidth()) * 10;
+            for (int x = 0; x < 10; x++) {
+                for (int y = 0; y < 10; y++) {
                     image.setRGB(w + x, h + y, c.raw);
                 }
             }

@@ -27,7 +27,7 @@ public class ImageToGraph implements Callable<Object> {
     private Path output = Path.of("").toAbsolutePath();
 
     @CommandLine.Option(names = "--keep-bg", description = "Keep the background")
-    private boolean keepBackground;
+    public boolean keepBackground;
 
     @CommandLine.Option(names = "--node-min-radius", description = "Node minimum radius. (default: ${DEFAULT-VALUE})")
     public int nodeMinRad = 3;
