@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.neo4j</groupId>
+		<artifactId>img2graph</artifactId>
+		<version>1</version>
+	</parent>
+	<artifactId>img2graph-bundle</artifactId>
+	<packaging>jlink</packaging>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.neo4j</groupId>
+			<artifactId>img2graph-cli</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-jlink-plugin</artifactId>
+				<version>3.1.0</version>
+				<extensions>true</extensions>
+				<configuration>
+					<launcher>img2graph=img2graph.cli/img2graph.cli.Application</launcher>
+					<finalName>${project.parent.artifactId}</finalName>
+					<outputDirectoryImage>${project.build.directory}/jlink</outputDirectoryImage>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

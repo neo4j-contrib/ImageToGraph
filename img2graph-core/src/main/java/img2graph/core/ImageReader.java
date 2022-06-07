@@ -1,4 +1,4 @@
-package img2graph;
+package img2graph.core;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -14,8 +14,8 @@ import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 
 class ImageReader {
-    private static Color WHITE = new Color(0xFFFFFFFF);
-    private static Color BLACK = new Color(0xFF000000);
+    private static final Color WHITE = new Color(0xFFFFFFFF);
+    private static final Color BLACK = new Color(0xFF000000);
 
     private final int targetRes;
     private final int colorDepth;
@@ -48,10 +48,11 @@ class ImageReader {
             }
         }
 
-        List<ColorBucket> trueColors = colorCount.values().stream()
-                .sorted((o1, o2) -> Integer.compare(o2.size, o1.size))
-                .limit(10)
-                .collect(Collectors.toList());
+        List<ColorBucket> trueColors =
+                colorCount.values().stream()
+                        .sorted((o1, o2) -> Integer.compare(o2.size, o1.size))
+                        .limit(10)
+                        .toList();
 
         List<Color> palette;
         if (trueColors.size() < 10 || trueColors.get(trueColors.size() - 1).size < 100) {
@@ -61,7 +62,8 @@ class ImageReader {
             palette.add(BLACK);
             palette.add(WHITE);
         }
-        Image img = new Image(image, resizeImage(image, targetRes), new Color(trueColors.get(0).rgb));
+        Image img =
+                new Image(image, resizeImage(image, targetRes), new Color(trueColors.get(0).rgb));
         for (int x = 0; x < image.getWidth(); x++) {
             for (int y = 0; y < image.getHeight(); y++) {
                 Color rawColor = new Color(image.getRGB(x, y));
@@ -197,7 +199,8 @@ class ImageReader {
         int targetWidth = (int) (sf * image.getWidth());
         java.awt.Image resultingImage =
                 image.getScaledInstance(targetWidth, targetHeight, java.awt.Image.SCALE_DEFAULT);
-        BufferedImage scaledImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage scaledImage =
+                new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics graphics = scaledImage.getGraphics();
         graphics.drawImage(resultingImage, 0, 0, null);
         graphics.dispose();

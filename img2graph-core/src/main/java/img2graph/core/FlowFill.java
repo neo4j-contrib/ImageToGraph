@@ -1,13 +1,8 @@
-package img2graph;
+package img2graph.core;
 
-import img2graph.ImageReader.Color;
-import img2graph.ImageReader.Image;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-import java.util.Set;
+import img2graph.core.ImageReader.Color;
+import img2graph.core.ImageReader.Image;
+import java.util.*;
 
 class FlowFill {
     private final Image img;
@@ -42,7 +37,8 @@ class FlowFill {
             for (int i = -1; i <= 1; i++) {
                 for (int j = -1; j <= 1; j++) {
                     if (!(i == 0 & j == 0)) {
-                        Coordinate shouldVisit = visitShallow(coordinate.x + i, coordinate.y + j, segment);
+                        Coordinate shouldVisit =
+                                visitShallow(coordinate.x + i, coordinate.y + j, segment);
                         if (shouldVisit != null) {
                             toVisit.add(shouldVisit);
                         }

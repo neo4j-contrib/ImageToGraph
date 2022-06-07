@@ -1,63 +1,63 @@
-package img2graph;
+package img2graph.core;
 
-import img2graph.FlowFill.Coordinate;
-import img2graph.ImageReader.Color;
-import img2graph.ImageReader.Image;
-import img2graph.NodeGenerator.Node;
-import img2graph.RelationshipGenerator.Relationship;
-import java.awt.BasicStroke;
+import img2graph.core.FlowFill.Coordinate;
+import img2graph.core.Graph.Node;
+import img2graph.core.Graph.Relationship;
+import img2graph.core.ImageReader.Color;
+import java.awt.*;
 import java.util.Base64;
 import java.util.Collection;
 import org.jfree.svg.SVGGraphics2D;
 
-public class Output {
+public final class Output {
 
-    public static String graphToSvg(
-            Image img,
-            boolean transparentBg,
-            boolean outline,
-            Collection<Node> nodes,
-            Collection<Relationship> relationships) {
-        SVGGraphics2D svg = new SVGGraphics2D(img.width, img.height);
+    public static String graphToSvg(Graph graph, boolean transparentBg, boolean outline) {
+        var width = graph.image().getWidth();
+        var height = graph.image().getHeight();
+        SVGGraphics2D svg = new SVGGraphics2D(width, height);
         if (!transparentBg) {
             svg.setPaint(java.awt.Color.WHITE);
-            svg.fillRect(0, 0, img.width, img.height);
+            svg.fillRect(0, 0, width, height);
         }
 
-        for (Relationship relationship : relationships) {
+        for (Relationship relationship : graph.relationships()) {
             svg.setPaint(new java.awt.Color(relationship.from().color().raw()));
             Coordinate from = relationship.from().coordinate();
             Coordinate to = relationship.to().coordinate();
             svg.drawLine(from.x(), from.y(), to.x(), to.y());
         }
         svg.setStroke(new BasicStroke(.50f));
-        for (Node node : nodes) {
+        for (Node node : graph.nodes()) {
             int radius = node.radius();
             int side = radius * 2;
             Color color = node.color();
             svg.setPaint(new java.awt.Color(color.raw()));
-            svg.fillOval(node.coordinate().x() - radius, node.coordinate().y() - radius, side, side);
+            svg.fillOval(
+                    node.coordinate().x() - radius, node.coordinate().y() - radius, side, side);
             if (outline) {
                 float factor = 0.5f / 255.f;
-                svg.setPaint(new java.awt.Color(color.r() * factor, color.g() * factor, color.b() * factor));
-                svg.drawOval(node.coordinate().x() - radius, node.coordinate().y() - radius, side, side);
+                svg.setPaint(
+                        new java.awt.Color(
+                                color.r() * factor, color.g() * factor, color.b() * factor));
+                svg.drawOval(
+                        node.coordinate().x() - radius, node.coordinate().y() - radius, side, side);
             }
         }
 
         return svg.getSVGElement();
     }
 
-    static String nodesToCsv(Collection<Node> nodes) {
+    public static String nodesToCsv(Graph graph) {
         StringBuilder nodesCsv = new StringBuilder();
-        for (Node node : nodes) {
+        for (Node node : graph.nodes()) {
             nodesCsv.append(node).append(",").append(node.color()).append('\n');
         }
         return nodesCsv.toString();
     }
 
-    static String relationshipsToCsv(Collection<Relationship> relationships) {
+    public static String relationshipsToCsv(Graph graph) {
         StringBuilder relCsv = new StringBuilder();
-        for (Relationship rel : relationships) {
+        for (Relationship rel : graph.relationships()) {
             relCsv.append(rel.from().id())
                     .append(",")
                     .append(rel.to().id())
@@ -68,7 +68,8 @@ public class Output {
         return relCsv.toString();
     }
 
-    static String graphToJson(Collection<Node> nodes, Collection<Relationship> relationships) {
+    public static String graphToJson(
+            Collection<Node> nodes, Collection<Relationship> relationships) {
         StringBuilder nodesJson = new StringBuilder();
         for (Node node : nodes) {
             nodesJson.append(nodeAsJson(node, node.color())).append(",");
@@ -89,7 +90,7 @@ public class Output {
         return String.format(jsonTemplate, nodesJson, relJson);
     }
 
-    static String arrowsUrl(String json) {
+    public static String arrowsUrl(String json) {
         return "https://arrows.app/#/import/json=" + base64Encode(json);
     }
 
