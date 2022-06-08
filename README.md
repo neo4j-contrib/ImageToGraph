@@ -9,8 +9,11 @@ Run: java17
 ## Usage
 
 1. Open a terminal and `cd` into this folder.
-2. Run `maven install` OR `mvn install` on Windows.
-3. Run `./run.sh /path/to/img` OR `java -jar .\target\img2graph-1.jar convert \path\to\image` on Windows.
+2. Run `./mvnw package` OR `mvnw.cmd package` on Windows.
+3. Run `./run.sh /path/to/img` OR `.\img2graph-bundle\target\jlink\default\bin\img2graph \path\to\image` on Windows.
+
+Alternatively you can start a local web server with `java -jar img2graph-web/target/quarkus-app/quarkus-run.jar` and 
+access a UI at http://localhost:8080.
 
 ## Arguments
 

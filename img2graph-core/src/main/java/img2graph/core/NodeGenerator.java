@@ -1,9 +1,9 @@
-package img2graph;
+package img2graph.core;
 
-import img2graph.FlowFill.Coordinate;
-import img2graph.FlowFill.Segment;
-import img2graph.ImageReader.Color;
-import img2graph.ImageReader.Image;
+import img2graph.core.FlowFill.Coordinate;
+import img2graph.core.FlowFill.Segment;
+import img2graph.core.ImageReader.Color;
+import img2graph.core.ImageReader.Image;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -19,7 +19,8 @@ class NodeGenerator {
     private final boolean useSimplifiedColor;
     private int nodeId = 0;
 
-    NodeGenerator(Image image, int minRadius, int maxRadius, int padding, boolean useSimplifiedColor) {
+    NodeGenerator(
+            Image image, int minRadius, int maxRadius, int padding, boolean useSimplifiedColor) {
         this.image = image;
         this.minRadius = minRadius;
         this.maxRadius = maxRadius;
@@ -27,8 +28,8 @@ class NodeGenerator {
         this.useSimplifiedColor = useSimplifiedColor;
     }
 
-    Collection<Node> generate(Segment segment) {
-        List<Node> nodes = new ArrayList<>();
+    Collection<Graph.Node> generate(Segment segment) {
+        List<Graph.Node> nodes = new ArrayList<>();
         int attempts = 0;
         while (attempts < MAX_ATTEMPTS && !segment.pixels.isEmpty()) {
             if (generateNodeFor(segment, nodes)) {
@@ -40,11 +41,12 @@ class NodeGenerator {
         return nodes;
     }
 
-    private boolean generateNodeFor(Segment segment, List<Node> into) {
-        Coordinate coordinate = segment.pixels.stream()
-                .skip(RANDOM.nextInt(segment.pixels.size()))
-                .findFirst()
-                .get();
+    private boolean generateNodeFor(Segment segment, List<Graph.Node> into) {
+        Coordinate coordinate =
+                segment.pixels.stream()
+                        .skip(RANDOM.nextInt(segment.pixels.size()))
+                        .findFirst()
+                        .get();
 
         int radius = -1;
         for (int i = minRadius; i <= maxRadius; i++) {
@@ -55,17 +57,19 @@ class NodeGenerator {
             }
         }
         if (radius > 0) {
-            Color color = useSimplifiedColor
-                    ? segment.color
-                    : new Color(image.original.getRGB(coordinate.x(), coordinate.y()));
-            into.add(new Node(coordinate, radius, nodeId++, color));
+            Color color =
+                    useSimplifiedColor
+                            ? segment.color
+                            : new Color(image.original.getRGB(coordinate.x(), coordinate.y()));
+            into.add(new Graph.Node(coordinate, radius, nodeId++, color));
 
             int padding = radius + this.padding;
             int paddingSq = padding * padding;
             for (int x = -padding; x <= padding; x++) {
                 for (int y = -padding; y < padding; y++) {
                     if (x * x + y * y <= paddingSq) {
-                        Coordinate removableCoordinate = new Coordinate(coordinate.x() + x, coordinate.y() + y);
+                        Coordinate removableCoordinate =
+                                new Coordinate(coordinate.x() + x, coordinate.y() + y);
                         segment.pixels.remove(removableCoordinate);
                     }
                 }
@@ -78,18 +82,12 @@ class NodeGenerator {
     private boolean isFree(Segment segment, Coordinate coordinate, int radius) {
         for (int x = -radius; x <= radius; x++) {
             for (int y = -radius; y < radius; y++) {
-                if (!segment.pixels.contains(new Coordinate(coordinate.x() + x, coordinate.y() + y))) {
+                if (!segment.pixels.contains(
+                        new Coordinate(coordinate.x() + x, coordinate.y() + y))) {
                     return false;
                 }
             }
         }
         return true;
-    }
-
-    record Node(Coordinate coordinate, int radius, int id, Color color) {
-        @Override
-        public String toString() {
-            return coordinate + "," + radius;
-        }
     }
 }
