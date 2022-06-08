@@ -8,7 +8,7 @@ Run: java17
 
 ## Usage
 
-1. Open a terminal and `cd` into this folder.
+1. Open a terminal in the root directory of this repo (here).
 2. Run `./mvnw package` OR `mvnw.cmd package` on Windows.
 3. Run `./run.sh /path/to/img` OR `.\img2graph-bundle\target\jlink\default\bin\img2graph \path\to\image` on Windows.
 
