@@ -1,10 +1,13 @@
 package img2graph.cli;
 
 import img2graph.core.Arguments;
-import img2graph.core.Graph;
 import img2graph.core.ImageToGraph;
 import img2graph.core.Output;
+import java.awt.*;
+import java.awt.datatransfer.StringSelection;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.Callable;
@@ -12,14 +15,14 @@ import javax.imageio.ImageIO;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "img2graph", description = "Convert an image to a graph")
-public final class Application implements Callable<Object> {
+public final class Application implements Callable<Integer> {
 
     @CommandLine.Parameters(index = "0", description = "Path to image to operate on")
     private Path input;
 
     @CommandLine.Option(
             names = "--output",
-            description = "Path to output directory. Default to current " + "working directory")
+            description = "Path to output directory. Default to current working directory")
     private Path output = Path.of("").toAbsolutePath();
 
     @CommandLine.Option(names = "--keep-bg", description = "Keep the background")
@@ -62,25 +65,31 @@ public final class Application implements Callable<Object> {
 
     @CommandLine.Option(
             names = "--simplified-colors",
-            description = "Use simplified colors. (default: " + "${DEFAULT-VALUE})")
+            description = "Use simplified colors. (default: ${DEFAULT-VALUE})")
     public boolean simplifiedColors = Arguments.DEFAULT_ARGUMENTS.simplifiedColors();
 
     @CommandLine.Option(
             names = "--transparent-bg",
-            description = "Transparent background for SVG output. (default: " + "${DEFAULT-VALUE})")
-    private boolean transparentBg = Arguments.DEFAULT_ARGUMENTS.transparentBg();
+            description = "Transparent background for SVG output. (default: ${DEFAULT-VALUE})")
+    public boolean transparentBg = Arguments.DEFAULT_ARGUMENTS.transparentBg();
 
     @CommandLine.Option(
             names = "--outline",
-            description = "Outline on nodes (default: " + "${DEFAULT-VALUE})")
+            description = "Outline on nodes. (default: ${DEFAULT-VALUE})")
     public boolean outline = Arguments.DEFAULT_ARGUMENTS.outline();
+
+    @CommandLine.Option(
+            names = "--open",
+            description = "Opens the generated Graph in Arrows.app. (default: ${DEFAULT-VALUE})")
+    public boolean open = false;
 
     public static void main(String[] args) {
         System.exit(new CommandLine(new Application()).execute(args));
     }
 
     @Override
-    public Object call() throws Exception {
+    public Integer call() throws Exception {
+
         if (!Files.exists(input)) {
             System.err.println(input.toString() + " does not exist.");
             System.exit(1);
@@ -103,10 +112,10 @@ public final class Application implements Callable<Object> {
                         simplifiedColors,
                         transparentBg,
                         outline);
-        System.out.println(args);
-        Graph graph = new ImageToGraph().process(args, new FileInputStream(input.toFile()));
 
-        String fileName = input.getFileName().toString();
+        var graph = new ImageToGraph().process(args, new FileInputStream(input.toFile()));
+
+        var fileName = input.getFileName().toString();
         if (fileName.lastIndexOf('.') != -1) {
             fileName = fileName.substring(0, fileName.lastIndexOf('.'));
         }
@@ -117,19 +126,45 @@ public final class Application implements Callable<Object> {
                 graph.nodes().size(), graph.relationships().size());
         System.out.println("Files saved at: " + output);
         System.out.println(
-                "Copy the json content and paste/import at https://arrows.app/ or use the url");
-        System.out.println("Or use the generated svg directly");
-        Path nodeOutput = output.resolve(fileName + "-nodes.csv").toAbsolutePath();
-        Path relOutput = output.resolve(fileName + "-rels.csv").toAbsolutePath();
-        Path urlOutput = output.resolve(fileName + "-url.txt").toAbsolutePath();
-        Path jsonOutput = output.resolve(fileName + "-graph.json").toAbsolutePath();
-        Path svgOutput = output.resolve(fileName + "-graph.svg").toAbsolutePath();
+                "Copy the json content and paste/import at https://arrows.app or use the generated"
+                        + " svg directly.");
+
+        var nodeOutput = output.resolve(fileName + "-nodes.csv").toAbsolutePath();
         Files.writeString(nodeOutput, Output.nodesToCsv(graph));
+        var relOutput = output.resolve(fileName + "-rels.csv").toAbsolutePath();
         Files.writeString(relOutput, Output.relationshipsToCsv(graph));
-        String json = Output.graphToJson(graph.nodes(), graph.relationships());
+
+        var jsonOutput = output.resolve(fileName + "-graph.json").toAbsolutePath();
+        var json = Output.graphToJson(graph.nodes(), graph.relationships());
         Files.writeString(jsonOutput, json);
-        Files.writeString(urlOutput, Output.arrowsUrl(json));
+
+        var svgOutput = output.resolve(fileName + "-graph.svg").toAbsolutePath();
         Files.writeString(svgOutput, Output.graphToSvg(graph, transparentBg, outline));
-        return null;
+
+        if (open) {
+            openOrCopyToClipboard(fileName, Output.arrowsUrl(json));
+        }
+
+        return 0;
+    }
+
+    void openOrCopyToClipboard(String fileName, String arrowsUrl) throws IOException {
+
+        if (GraphicsEnvironment.isHeadless() || !Desktop.isDesktopSupported()) {
+            var urlOutput = output.resolve(fileName + "-url.txt").toAbsolutePath();
+            Files.writeString(urlOutput, arrowsUrl);
+            System.out.println(
+                    "Running in a headless environment, URL has been written to " + urlOutput);
+        } else if (!Desktop.isDesktopSupported()) {
+            var defaultToolkit = Toolkit.getDefaultToolkit();
+            var clipboard = defaultToolkit.getSystemClipboard();
+            clipboard.setContents(new StringSelection(arrowsUrl), null);
+            System.out.println(
+                    "URL has been copied to your clipboard. Just use your preferred browser and"
+                            + " paste there.");
+        } else {
+            var desktop = Desktop.getDesktop();
+            desktop.browse(URI.create(arrowsUrl));
+        }
     }
 }
