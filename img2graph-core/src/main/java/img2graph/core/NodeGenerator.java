@@ -7,10 +7,8 @@ import img2graph.core.ImageReader.Image;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Random;
 
 class NodeGenerator {
-    private static final int MAX_ATTEMPTS = 1000;
     private final Image image;
     private final int minRadius;
     private final int maxRadius;
