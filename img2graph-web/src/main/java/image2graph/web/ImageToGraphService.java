@@ -12,9 +12,6 @@ import javax.inject.Singleton;
 
 @Singleton
 public class ImageToGraphService {
-
-    private static final String UPLOAD_DIR = "/tmp/upload";
-
     private final ImageToGraph imageToGraph = new ImageToGraph();
 
     public String preview(UploadFormData input) {

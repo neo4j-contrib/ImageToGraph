@@ -8,10 +8,14 @@ public final class UploadFormData {
 
     @RestForm public FileUpload file;
 
+    @RestForm("nodes-in-bg")
+    public String nodesInBackground;
+
     @RestForm("simple-color")
     public String useSimpleColors;
 
-    @RestForm public String outline;
+    @RestForm("outline")
+    public String outline;
 
     @RestForm("node-max")
     public Integer nodeMax;
@@ -33,7 +37,7 @@ public final class UploadFormData {
 
     public Arguments asArguments() {
         return new Arguments(
-                false,
+                "on".equalsIgnoreCase(nodesInBackground),
                 Math.min(nodeMax, nodeMin),
                 Math.max(nodeMax, nodeMin),
                 nodePadding,
