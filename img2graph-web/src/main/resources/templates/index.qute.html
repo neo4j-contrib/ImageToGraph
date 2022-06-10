@@ -88,50 +88,48 @@
         <input type='file' id="file" name='file' accept='image/*' onchange="if (this.value) submit();"/>
 
         <div id="advanced" style="display:none">
-            <input id="nodes-in-bg" class='checkbox' type="checkbox" name="nodes-in-bg">
+            <input id="nodes-in-bg" class='checkbox' type="checkbox" name="nodes-in-bg" onchange="preview()">
             <label class="advancedLabel" for="nodes-in-bg">Put nodes in background</label>
             <br>
-            <input id="simple-color" class='checkbox' type="checkbox" name="simple-color">
+            <input id="simple-color" class='checkbox' type="checkbox" name="simple-color" onchange="preview()">
             <label class="advancedLabel" for="simple-color">Use simple colors</label>
             <br>
-            <input id="outline" class='checkbox' type="checkbox" name="outline">
+            <input id="outline" class='checkbox' type="checkbox" name="outline" onchange="preview()">
             <label class="advancedLabel" for="outline">Outline nodes</label>
             <br>
             <input id="node-max" type="range" min="1" max="50" value="10" class="slider" name="node-max"
-                   oninput="this.nextElementSibling.value = this.value">
+                   oninput="this.nextElementSibling.value = this.value" onchange="preview()">
             <output class="sliderOutput"></output>
             <label class="advancedLabel" for="node-max">Node max size</label>
             <br>
             <input id="node-min" type="range" min="1" max="30" value="3" class="slider" name="node-min"
-                   oninput="this.nextElementSibling.value = this.value">
+                   oninput="this.nextElementSibling.value = this.value" onchange="preview()">
             <output class="sliderOutput"></output>
             <label class="advancedLabel" for="node-min">Node min size</label>
             <br>
             <input id="node-padding" type="range" min="1" max="10" value="2" class="slider" name="node-padding"
-                   oninput="this.nextElementSibling.value = this.value">
+                   oninput="this.nextElementSibling.value = this.value" onchange="preview()">
             <output class="sliderOutput"></output>
             <label class="advancedLabel" for="node-padding">Node padding</label>
             <br>
             <input id="rel-avg" type="range" min="1" max="5" value="2" class="slider" name="rel-avg"
-                   oninput="this.nextElementSibling.value = this.value">
+                   oninput="this.nextElementSibling.value = this.value" onchange="preview()">
             <output id="rel-avg-out" class="sliderOutput"></output>
             <label class="advancedLabel" for="rel-avg">Avg relationships</label>
             <br>
             <input id="rel-max-length" type="range" min="1" max="100" value="20" class="slider" name="rel-max-length"
-                   oninput="this.nextElementSibling.value = this.value">
+                   oninput="this.nextElementSibling.value = this.value" onchange="preview()">
             <output id="rel-max-length-out" class="sliderOutput"></output>
             <label class="advancedLabel" for="rel-max-length">Max relationship length</label>
             <br>
             <input id="color-depth" type="range" min="1" max="5" value="4" class="slider" name="color-depth"
-                   oninput="this.nextElementSibling.value = this.value">
+                   oninput="this.nextElementSibling.value = this.value" onchange="preview()">
             <output class="sliderOutput"></output>
             <label class="advancedLabel" for="color-depth">Color depth (bits)</label>
             <br>
         </div>
     </form>
     <div id="preview" style="display:none">
-        <button class="btn" name="preview" style="font-size: 10px; padding: 5px;" onclick="preview()">Preview</button>
-        <br>
         <div id="preview-container" style="width: 350px; height: 125px"></div>
     </div>
 </div>
@@ -145,6 +143,8 @@
         for (const out of document.getElementsByClassName("sliderOutput")) {
             out.value = out.previousElementSibling.value
         }
+
+        preview();
 
         function toggleAdvanced() {
             const adv = document.getElementById("advanced");

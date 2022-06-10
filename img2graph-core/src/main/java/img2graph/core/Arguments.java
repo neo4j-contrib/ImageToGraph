@@ -33,19 +33,4 @@ public record Arguments(
                 transparentBg,
                 outline);
     }
-
-    public Arguments withKeepBackground(boolean newValue) {
-        return new Arguments(
-                newValue,
-                nodeMinRad,
-                nodeMaxRad,
-                nodePadding,
-                relMaxDist,
-                relsPerNode,
-                targetResolution,
-                colorDepth,
-                simplifiedColors,
-                transparentBg,
-                outline);
-    }
 }

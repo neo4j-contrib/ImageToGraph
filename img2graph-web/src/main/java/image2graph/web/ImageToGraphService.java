@@ -15,16 +15,15 @@ public class ImageToGraphService {
     private final ImageToGraph imageToGraph = new ImageToGraph();
 
     public String preview(UploadFormData input) {
-        Arguments args = input.asArguments().withTargetResolution(350).withKeepBackground(true);
+        Arguments args = input.asArguments().withTargetResolution(350);
         Graph graph;
         try (InputStream inputStream =
                 Thread.currentThread().getContextClassLoader().getResourceAsStream("preview.png")) {
             graph = imageToGraph.process(args, inputStream);
             return Output.graphToSvg(graph, true, args.outline());
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new UncheckedIOException(e);
         }
-        return "Preview not available";
     }
 
     public String convert(UploadFormData input) {
