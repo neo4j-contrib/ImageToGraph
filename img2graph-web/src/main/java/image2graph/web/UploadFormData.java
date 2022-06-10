@@ -5,8 +5,12 @@ import org.jboss.resteasy.reactive.RestForm;
 import org.jboss.resteasy.reactive.multipart.FileUpload;
 
 public final class UploadFormData {
+    private static final String ON = "on";
 
     @RestForm public FileUpload file;
+
+    @RestForm("arrows-redirect")
+    public String redirectToArrows;
 
     @RestForm("nodes-in-bg")
     public String nodesInBackground;
@@ -37,7 +41,7 @@ public final class UploadFormData {
 
     public Arguments asArguments() {
         return new Arguments(
-                "on".equalsIgnoreCase(nodesInBackground),
+                ON.equalsIgnoreCase(nodesInBackground),
                 Math.min(nodeMax, nodeMin),
                 Math.max(nodeMax, nodeMin),
                 nodePadding,
@@ -45,8 +49,12 @@ public final class UploadFormData {
                 relAvg,
                 Arguments.DEFAULT_ARGUMENTS.targetResolution(),
                 colorDepth,
-                "on".equalsIgnoreCase(useSimpleColors),
+                ON.equalsIgnoreCase(useSimpleColors),
                 Arguments.DEFAULT_ARGUMENTS.transparentBg(),
-                "on".equalsIgnoreCase(outline));
+                ON.equalsIgnoreCase(outline));
+    }
+
+    public boolean shouldRedirectToArrows() {
+        return ON.equalsIgnoreCase(redirectToArrows);
     }
 }

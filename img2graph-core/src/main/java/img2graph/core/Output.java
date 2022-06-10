@@ -6,7 +6,6 @@ import img2graph.core.Graph.Relationship;
 import img2graph.core.ImageReader.Color;
 import java.awt.*;
 import java.util.Base64;
-import java.util.Collection;
 import org.jfree.svg.SVGGraphics2D;
 
 public final class Output {
@@ -68,15 +67,14 @@ public final class Output {
         return relCsv.toString();
     }
 
-    public static String graphToJson(
-            Collection<Node> nodes, Collection<Relationship> relationships) {
+    public static String graphToJson(Graph graph) {
         StringBuilder nodesJson = new StringBuilder();
-        for (Node node : nodes) {
+        for (Node node : graph.nodes()) {
             nodesJson.append(nodeAsJson(node, node.color())).append(",");
         }
 
         StringBuilder relJson = new StringBuilder();
-        for (Relationship rel : relationships) {
+        for (Relationship rel : graph.relationships()) {
             relJson.append(relAsJson(rel, rel.from().color())).append(",");
         }
 

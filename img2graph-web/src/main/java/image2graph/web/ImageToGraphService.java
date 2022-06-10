@@ -15,12 +15,11 @@ public class ImageToGraphService {
     private final ImageToGraph imageToGraph = new ImageToGraph();
 
     public String preview(UploadFormData input) {
-        Arguments args = input.asArguments().withTargetResolution(350);
-        Graph graph;
+        Arguments arguments = input.asArguments().withTargetResolution(350);
         try (InputStream inputStream =
                 Thread.currentThread().getContextClassLoader().getResourceAsStream("preview.png")) {
-            graph = imageToGraph.process(args, inputStream);
-            return Output.graphToSvg(graph, true, args.outline());
+            Graph graph = imageToGraph.process(arguments, inputStream);
+            return Output.graphToSvg(graph, true, arguments.outline());
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -34,7 +33,12 @@ public class ImageToGraphService {
 
         try (InputStream inputStream = Files.newInputStream(input.file.filePath())) {
             Graph graph = imageToGraph.process(arguments, inputStream);
-            return Output.graphToSvg(graph, true, arguments.outline());
+            if (input.shouldRedirectToArrows()) {
+                String json = Output.graphToJson(graph);
+                return Output.arrowsUrl(json);
+            } else {
+                return Output.graphToSvg(graph, true, arguments.outline());
+            }
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

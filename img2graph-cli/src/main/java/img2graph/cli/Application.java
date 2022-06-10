@@ -135,7 +135,7 @@ public final class Application implements Callable<Integer> {
         Files.writeString(relOutput, Output.relationshipsToCsv(graph));
 
         var jsonOutput = output.resolve(fileName + "-graph.json").toAbsolutePath();
-        var json = Output.graphToJson(graph.nodes(), graph.relationships());
+        var json = Output.graphToJson(graph);
         Files.writeString(jsonOutput, json);
 
         var svgOutput = output.resolve(fileName + "-graph.svg").toAbsolutePath();
