@@ -2,7 +2,14 @@ package img2graph.core;
 
 import img2graph.core.ImageReader.Color;
 import img2graph.core.ImageReader.Image;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+import java.util.Random;
+import java.util.Set;
 
 class FlowFill {
     private final Image img;
@@ -80,9 +87,26 @@ class FlowFill {
     static class Segment {
         final Color color;
         final Set<Coordinate> pixels = new HashSet<>();
+        private List<Coordinate> rndCache;
+        private int rndIndex;
 
-        public Segment(Color color) {
+        Segment(Color color) {
             this.color = color;
+        }
+
+        Coordinate randomPixel() {
+            if (rndCache == null) {
+                rndCache = new ArrayList<>(pixels);
+                Collections.shuffle(rndCache);
+                rndIndex = rndCache.size();
+            }
+            while (rndIndex > 0) {
+                Coordinate coordinate = rndCache.get(--rndIndex);
+                if (pixels.contains(coordinate)) {
+                    return coordinate;
+                }
+            }
+            return null;
         }
     }
 }

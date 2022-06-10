@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Random;
 
 class NodeGenerator {
-    private static final Random RANDOM = new Random(45);
     private static final int MAX_ATTEMPTS = 1000;
     private final Image image;
     private final int minRadius;
@@ -30,24 +29,14 @@ class NodeGenerator {
 
     Collection<Graph.Node> generate(Segment segment) {
         List<Graph.Node> nodes = new ArrayList<>();
-        int attempts = 0;
-        while (attempts < MAX_ATTEMPTS && !segment.pixels.isEmpty()) {
-            if (generateNodeFor(segment, nodes)) {
-                attempts = 0;
-            } else {
-                attempts++;
-            }
+        Coordinate coordinate;
+        while ((coordinate = segment.randomPixel()) != null) {
+            tryPutNodeAt(coordinate, segment, nodes);
         }
         return nodes;
     }
 
-    private boolean generateNodeFor(Segment segment, List<Graph.Node> into) {
-        Coordinate coordinate =
-                segment.pixels.stream()
-                        .skip(RANDOM.nextInt(segment.pixels.size()))
-                        .findFirst()
-                        .get();
-
+    private void tryPutNodeAt(Coordinate coordinate, Segment segment, List<Graph.Node> into) {
         int radius = -1;
         for (int i = minRadius; i <= maxRadius; i++) {
             if (isFree(segment, coordinate, i)) {
@@ -74,9 +63,7 @@ class NodeGenerator {
                     }
                 }
             }
-            return true;
         }
-        return false;
     }
 
     private boolean isFree(Segment segment, Coordinate coordinate, int radius) {
