@@ -62,6 +62,7 @@ class ImageReader {
             palette.add(BLACK);
             palette.add(WHITE);
         }
+        palette = mergeIndistinguishableColors(palette);
         Image img =
                 new Image(image, resizeImage(image, targetRes), new Color(trueColors.get(0).rgb));
         for (int x = 0; x < image.getWidth(); x++) {
@@ -74,6 +75,25 @@ class ImageReader {
         }
         // addDebugPalette(image, palette);
         return img;
+    }
+
+    private List<Color> mergeIndistinguishableColors(List<Color> palette) {
+        List<Color> mergedPalette = new ArrayList<>();
+        for (int i = 0; i < palette.size(); i++) {
+            Color color = palette.get(i);
+            if (color != null) {
+                ColorBucket bucket = new ColorBucket(0);
+                for (int j = 0; j < palette.size(); j++) {
+                    Color otherColor = palette.get(j);
+                    if (otherColor != null && color.distSq(otherColor) < 10) {
+                        bucket.add(otherColor.raw);
+                        palette.set(j, null);
+                    }
+                }
+                mergedPalette.add(bucket.size > 1 ? new Color(bucket.getAverage()) : color);
+            }
+        }
+        return mergedPalette;
     }
 
     private List<Color> medianCut(BufferedImage image) {
