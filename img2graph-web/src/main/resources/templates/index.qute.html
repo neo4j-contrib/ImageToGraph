@@ -85,7 +85,7 @@
 
     <form id="submit-img" method='post' enctype='multipart/form-data'>
         <button type="button" class='btn' onclick='document.getElementById("file").click();'>Upload a file</button>
-        <input type='file' id="file" name='file' accept='image/*' onchange="submit();"/>
+        <input type='file' id="file" name='file' accept='image/*' onchange="if (this.value) submit();"/>
 
         <div id="advanced" style="display:none">
             <input id="nodes-in-bg" class='checkbox' type="checkbox" name="nodes-in-bg">
