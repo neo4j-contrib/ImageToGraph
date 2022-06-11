@@ -130,6 +130,7 @@
 				<skipITs>true</skipITs>
 				<skipNativeBuild>true</skipNativeBuild>
 				<skipTests>true</skipTests>
+				<sort.skip>true</sort.skip>
 				<spotless.check.skip>true</spotless.check.skip>
 			</properties>
 		</profile>
