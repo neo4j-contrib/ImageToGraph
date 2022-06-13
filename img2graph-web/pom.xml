@@ -9,12 +9,6 @@
 
 	<artifactId>img2graph-web</artifactId>
 
-	<properties>
-		<quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
-		<quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
-		<quarkus.platform.version>2.9.2.Final</quarkus.platform.version>
-	</properties>
-
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -44,17 +38,9 @@
 			<plugin>
 				<groupId>${quarkus.platform.group-id}</groupId>
 				<artifactId>quarkus-maven-plugin</artifactId>
-				<version>${quarkus.platform.version}</version>
-				<extensions>true</extensions>
-				<executions>
-					<execution>
-						<goals>
-							<goal>build</goal>
-							<goal>generate-code</goal>
-							<goal>generate-code-tests</goal>
-						</goals>
-					</execution>
-				</executions>
+				<configuration combine.self="append">
+					<skip>false</skip>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

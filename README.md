@@ -32,3 +32,11 @@ access a UI at http://localhost:8080.
 |--target-res=\<targetResolution>|Target resolution. Changes size of graph. (default:1024)|
 |--transparent-bg|Transparent background for SVG output. (default:false)|
 |--open|Opens the generated Graph in Arrows.app. (default:false)|
+
+## Development
+
+A local development server can easily be started with
+
+```
+./mvnw quarkus:dev
+```
