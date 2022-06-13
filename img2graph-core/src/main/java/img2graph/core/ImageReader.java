@@ -35,16 +35,12 @@ class ImageReader {
     }
 
     private Image simplifyColor(BufferedImage image) {
-        List<Color> colors = new ArrayList<>(image.getWidth() * image.getHeight());
+
         Map<Integer, ColorBucket> colorCount = new HashMap<>();
         for (int x = 0; x < image.getWidth(); x++) {
             for (int y = 0; y < image.getHeight(); y++) {
                 int rawColor = image.getRGB(x, y);
-                Color color = new Color(rawColor);
                 colorCount.computeIfAbsent(rawColor, ColorBucket::new).add(rawColor);
-                if (!BLACK.equals(color) && !WHITE.equals(color)) {
-                    colors.add(color);
-                }
             }
         }
 
