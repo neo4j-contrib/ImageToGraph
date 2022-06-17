@@ -65,10 +65,12 @@ class NodeGenerator {
     }
 
     private boolean isFree(Segment segment, Coordinate coordinate, int radius) {
+        int radSq = radius * radius;
         for (int x = -radius; x <= radius; x++) {
             for (int y = -radius; y < radius; y++) {
-                if (!segment.pixels.contains(
-                        new Coordinate(coordinate.x() + x, coordinate.y() + y))) {
+                if (x * x + y * y <= radSq
+                        && !segment.pixels.contains(
+                                new Coordinate(coordinate.x() + x, coordinate.y() + y))) {
                     return false;
                 }
             }

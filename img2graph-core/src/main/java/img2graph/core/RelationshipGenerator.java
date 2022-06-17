@@ -7,7 +7,6 @@ import img2graph.core.Graph.Node;
 import img2graph.core.ImageReader.Color;
 import img2graph.core.ImageReader.Image;
 import java.util.*;
-import java.util.stream.Collectors;
 
 class RelationshipGenerator {
     private final Image image;
@@ -37,12 +36,14 @@ class RelationshipGenerator {
         sortedY.addAll(nodes);
         int biggestNode = nodes.stream().map(Graph.Node::radius).max(Integer::compare).orElse(0);
         for (Node node : nodes) {
-            List<Node> neighbors = nearestNeighbors(node, 10, biggestNode);
+            List<Node> neighbors = nearestNeighbors(node, biggestNode);
             neighbors.sort(Comparator.comparingDouble(n -> weightedSort(n, node)));
-            for (int i = 0; i < numRels && i < neighbors.size(); i++) {
+            int relsAdded = 0;
+            for (int i = 0; relsAdded < numRels && i < neighbors.size(); i++) {
                 Graph.Relationship relationship =
                         new Graph.Relationship(node, neighbors.get(i), relId++);
                 if (validate(relationship)) {
+                    relsAdded++;
                     relationships.add(relationship);
                 }
             }
@@ -75,7 +76,7 @@ class RelationshipGenerator {
         return true;
     }
 
-    private List<Node> nearestNeighbors(Node node, int limit, int biggestNode) {
+    private List<Node> nearestNeighbors(Node node, int biggestNode) {
         int maxDist = maxDistance + biggestNode + node.radius();
         Node lowKey =
                 new Node(
@@ -91,11 +92,10 @@ class RelationshipGenerator {
                         0,
                         0,
                         null);
-        Set<Node> closeNodes = new HashSet<>();
-        closeNodes.addAll(sortedX.subSet(lowKey, highKey));
+        Set<Node> closeNodes = new HashSet<>(sortedX.subSet(lowKey, highKey));
         closeNodes.retainAll(sortedY.subSet(lowKey, highKey));
         closeNodes.remove(node);
-        return closeNodes.stream().limit(limit).collect(Collectors.toList());
+        return new ArrayList<>(closeNodes);
     }
 
     private static double weightedSort(Node neighbour, Node node) {
