@@ -14,29 +14,59 @@ class NodeGenerator {
     private final int maxRadius;
     private final int padding;
     private final boolean useSimplifiedColor;
+    private final long segmentedSize;
+    private final int maxSuperNodes;
+    private int numberOfSuperNodes;
     private int nodeId = 0;
 
     NodeGenerator(
-            Image image, int minRadius, int maxRadius, int padding, boolean useSimplifiedColor) {
+            Image image,
+            int minRadius,
+            int maxRadius,
+            int padding,
+            int maxSuperNodes,
+            boolean useSimplifiedColor,
+            long segmentedSize) {
         this.image = image;
         this.minRadius = minRadius;
         this.maxRadius = maxRadius;
         this.padding = padding;
+        this.maxSuperNodes = maxSuperNodes;
         this.useSimplifiedColor = useSimplifiedColor;
+        this.segmentedSize = segmentedSize;
     }
 
     Collection<Graph.Node> generate(Segment segment) {
+        double segmentPercent = (double) segment.pixels.size() / segmentedSize;
+        int superNodesLimit =
+                maxSuperNodes > numberOfSuperNodes
+                        ? Math.max(1, (int) Math.round(segmentPercent * maxSuperNodes))
+                        : 0;
+
         List<Graph.Node> nodes = new ArrayList<>();
         Coordinate coordinate;
         while ((coordinate = segment.randomPixel()) != null) {
-            tryPutNodeAt(coordinate, segment, nodes);
+            if (tryPutNodeAt(coordinate, segment, nodes, superNodesLimit > 0)) {
+                superNodesLimit--;
+            }
         }
         return nodes;
     }
 
-    private void tryPutNodeAt(Coordinate coordinate, Segment segment, List<Graph.Node> into) {
+    private boolean tryPutNodeAt(
+            Coordinate coordinate,
+            Segment segment,
+            List<Graph.Node> into,
+            boolean canPlaceSuperNode) {
         int radius = -1;
-        for (int i = minRadius; i <= maxRadius; i++) {
+        int extra =
+                canPlaceSuperNode
+                        ? (int)
+                                ((3.0 * maxRadius)
+                                        * (maxSuperNodes - numberOfSuperNodes * 0.8)
+                                        / maxSuperNodes)
+                        : 0;
+        for (int i = minRadius; i <= maxRadius + extra; i++) {
             if (isFree(segment, coordinate, i)) {
                 radius = i;
             } else {
@@ -44,6 +74,10 @@ class NodeGenerator {
             }
         }
         if (radius > 0) {
+            if (radius > maxRadius) {
+                numberOfSuperNodes++;
+            }
+
             Color color =
                     useSimplifiedColor
                             ? segment.color
@@ -62,6 +96,7 @@ class NodeGenerator {
                 }
             }
         }
+        return radius > maxRadius;
     }
 
     private boolean isFree(Segment segment, Coordinate coordinate, int radius) {

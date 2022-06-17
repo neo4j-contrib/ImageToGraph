@@ -5,6 +5,7 @@ public record Arguments(
         int nodeMinRad,
         int nodeMaxRad,
         int nodePadding,
+        int numSuperNodes,
         int relMaxDist,
         int relsPerNode,
         int targetResolution,
@@ -14,7 +15,7 @@ public record Arguments(
         boolean outline) {
 
     Arguments() {
-        this(false, 3, 10, 2, 20, 2, 1024, 4, false, false, false);
+        this(false, 3, 10, 2, 0, 20, 2, 1024, 4, false, false, false);
     }
 
     public static final Arguments DEFAULT_ARGUMENTS = new Arguments();
@@ -25,6 +26,7 @@ public record Arguments(
                 nodeMinRad,
                 nodeMaxRad,
                 nodePadding,
+                numSuperNodes,
                 relMaxDist,
                 relsPerNode,
                 newTargetResolution,

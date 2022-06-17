@@ -30,6 +30,9 @@ public final class UploadFormData {
     @RestForm("node-padding")
     public Integer nodePadding;
 
+    @RestForm("supernodes")
+    public Integer superNodes;
+
     @RestForm("color-depth")
     public Integer colorDepth;
 
@@ -45,6 +48,7 @@ public final class UploadFormData {
                 Math.min(nodeMax, nodeMin),
                 Math.max(nodeMax, nodeMin),
                 nodePadding,
+                superNodes,
                 relLength,
                 relAvg,
                 Arguments.DEFAULT_ARGUMENTS.targetResolution(),

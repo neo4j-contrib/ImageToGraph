@@ -7,6 +7,7 @@ import img2graph.core.ImageReader.Image;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 
 public class ImageToGraph {
@@ -36,18 +37,22 @@ public class ImageToGraph {
                         arguments.nodeMinRad(),
                         arguments.nodeMaxRad(),
                         arguments.nodePadding(),
-                        arguments.simplifiedColors());
+                        arguments.numSuperNodes(),
+                        arguments.simplifiedColors(),
+                        segments.stream().mapToLong(s1 -> s1.pixels.size()).sum());
         RelationshipGenerator relationshipGenerator =
                 new RelationshipGenerator(img, arguments.relMaxDist(), arguments.relsPerNode());
         List<Node> allNodes = new ArrayList<>();
         List<Relationship> allRels = new ArrayList<>();
-
+        segments.sort(Comparator.comparingLong((Segment s) -> s.pixels.size()).reversed());
         for (Segment segment : segments) {
-            System.out.print("Generating graph for segment #" + segment.color + ". ");
             Collection<Node> nodes = nodeGenerator.generate(segment);
-            System.out.print(nodes.size() + " nodes");
             Collection<Relationship> relationships = relationshipGenerator.generate(nodes);
-            System.out.println(" & " + relationships.size() + " relationships");
+            if (nodes.size() > 0) {
+                System.out.printf(
+                        "Generated graph for segment #%s. %s nodes & %s relationships%n",
+                        segment.color, nodes.size(), relationships.size());
+            }
             allNodes.addAll(nodes);
             allRels.addAll(relationships);
         }

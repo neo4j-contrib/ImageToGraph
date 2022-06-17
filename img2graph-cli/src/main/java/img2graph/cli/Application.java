@@ -44,6 +44,11 @@ public final class Application implements Callable<Integer> {
     public int nodePadding = Arguments.DEFAULT_ARGUMENTS.nodePadding();
 
     @CommandLine.Option(
+            names = "--supernodes",
+            description = "Number of extra big nodes. (default: ${DEFAULT-VALUE})")
+    public int superNodes = Arguments.DEFAULT_ARGUMENTS.numSuperNodes();
+
+    @CommandLine.Option(
             names = "--rel-max-distance",
             description = "Relationship maximum distance. (default: ${DEFAULT-VALUE})")
     public int relMaxDist = Arguments.DEFAULT_ARGUMENTS.relMaxDist();
@@ -105,6 +110,7 @@ public final class Application implements Callable<Integer> {
                         nodeMinRad,
                         nodeMaxRad,
                         nodePadding,
+                        superNodes,
                         relMaxDist,
                         relsPerNode,
                         targetResolution,

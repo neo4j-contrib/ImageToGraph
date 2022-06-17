@@ -115,6 +115,11 @@
             <output class="sliderOutput"></output>
             <label class="advancedLabel" for="node-padding">Node padding</label>
             <br>
+            <input id="supernodes" type="range" min="0" max="100" value="0" class="slider" name="supernodes"
+                   oninput="this.nextElementSibling.value = this.value" onchange="preview()">
+            <output class="sliderOutput"></output>
+            <label class="advancedLabel" for="supernodes">Extra big nodes</label>
+            <br>
             <input id="rel-avg" type="range" min="1" max="5" value="2" class="slider" name="rel-avg"
                    oninput="this.nextElementSibling.value = this.value" onchange="preview()">
             <output id="rel-avg-out" class="sliderOutput"></output>
