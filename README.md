@@ -40,3 +40,7 @@ A local development server can easily be started with
 ```
 ./mvnw quarkus:dev
 ```
+
+## Running instance
+
+A running instance is available at https://image2graph.herokuapp.com
